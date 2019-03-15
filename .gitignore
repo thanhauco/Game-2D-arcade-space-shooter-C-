@@ -1,0 +1,26 @@
+# Build artifacts
+*.o
+*.obj
+*.exe
+stellar_fury
+stellar_fury.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+*.dSYM/
+
+# Debug
+*.log
+core
+core.*
+
+# Dependencies (if using package managers)
+vcpkg_installed/
+build/
