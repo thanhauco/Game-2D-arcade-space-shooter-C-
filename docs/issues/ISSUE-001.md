@@ -19,4 +19,4 @@ Medium
 
 ## Status
 
-Open
+Closed - Fixed in commit 097d9c1
