@@ -66,17 +66,18 @@ void Player::shoot(Game &game) {
 }
 
 void Player::clampToScreen(int screenWidth, int screenHeight) {
-  float halfWidth = width / 2;
-  float halfHeight = height / 2;
+  // Add padding for wings (10px extra on each side)
+  float paddingX = width / 2 + 10;
+  float paddingY = height / 2 + 5;
 
-  if (position.x < halfWidth)
-    position.x = halfWidth;
-  if (position.x > screenWidth - halfWidth)
-    position.x = screenWidth - halfWidth;
-  if (position.y < halfHeight)
-    position.y = halfHeight;
-  if (position.y > screenHeight - halfHeight)
-    position.y = screenHeight - halfHeight;
+  if (position.x < paddingX)
+    position.x = paddingX;
+  if (position.x > screenWidth - paddingX)
+    position.x = screenWidth - paddingX;
+  if (position.y < paddingY)
+    position.y = paddingY;
+  if (position.y > screenHeight - paddingY)
+    position.y = screenHeight - paddingY;
 }
 
 void Player::takeDamage(int amount) {
