@@ -177,7 +177,8 @@ void Game::updatePlaying(float deltaTime) {
   enemySpawnTimer -= deltaTime;
   if (enemySpawnTimer <= 0) {
     spawnEnemy();
-    enemySpawnTimer = 2.0f / difficulty; // Spawn faster as difficulty increases
+    // Base spawn rate of 3 seconds, decreasing with difficulty
+    enemySpawnTimer = 3.0f / difficulty;
   }
 
   // Update enemies
