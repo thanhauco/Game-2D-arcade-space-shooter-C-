@@ -19,4 +19,4 @@ High
 
 ## Status
 
-Open
+Closed - Fixed with slower spawn rate
