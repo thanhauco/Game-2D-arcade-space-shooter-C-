@@ -411,7 +411,7 @@ void Game::endGame() {
 
 void Game::addScore(int points) {
   combo++;
-  comboTimer = 2.0f; // Reset combo timer
+  comboTimer = 3.0f; // Reset combo timer (extended for better gameplay)
   score += points * combo;
 }
 
