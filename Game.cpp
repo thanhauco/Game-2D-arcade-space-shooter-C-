@@ -278,8 +278,8 @@ void Game::updatePlaying(float deltaTime) {
                                  [](const auto &p) { return !p->isActive(); }),
                   particles.end());
 
-  // Increase difficulty over time
-  difficulty += deltaTime * 0.01f;
+  // Increase difficulty over time (faster scaling)
+  difficulty += deltaTime * 0.02f;
   if (difficulty > 5.0f)
     difficulty = 5.0f;
 }
