@@ -83,19 +83,19 @@ void Enemy::updateHunter(float deltaTime, Game &game) {
   // Move downward initially
   velocity.y = 60.0f;
 
-  // Track player horizontally if game is playing
+  // Track horizontally if game is playing
+  // TODO: In future, track actual player X position via game.getPlayerX()
   if (game.getState() == GameState::Playing) {
-    // We need to get player position somehow
-    // For now, move toward center with some tracking
-    float targetX = game.getWidth() / 2.0f;
+    // Move toward player area (slightly random for variety)
+    float targetX = game.getWidth() / 2.0f + std::sin(animTimer) * 100.0f;
     float diff = targetX - position.x;
-    velocity.x = diff * 0.5f;
+    velocity.x = diff * 0.8f; // Increased tracking speed
 
     // Clamp horizontal speed
-    if (velocity.x > 150)
-      velocity.x = 150;
-    if (velocity.x < -150)
-      velocity.x = -150;
+    if (velocity.x > 180)
+      velocity.x = 180;
+    if (velocity.x < -180)
+      velocity.x = -180;
   }
 
   // Shoot more aggressively
