@@ -87,10 +87,10 @@ void HUD::renderScore(SDL_Renderer *renderer, int score) {
   SDL_RenderDrawRect(renderer, &bg);
 
   // Score visualization (bar representing score magnitude)
-  // Each segment = 1000 points
+  // Each segment = 1000 points, max 20 segments for 20k display
   int segments = displayedScore / 1000;
-  if (segments > 14)
-    segments = 14;
+  if (segments > 20)
+    segments = 20;
 
   SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);
   for (int i = 0; i < segments; i++) {
@@ -100,10 +100,10 @@ void HUD::renderScore(SDL_Renderer *renderer, int score) {
 
   // Partial segment for remainder
   int remainder = (displayedScore % 1000) / 100;
-  if (segments < 14 && remainder > 0) {
+  if (segments < 20 && remainder > 0) {
     SDL_SetRenderDrawColor(renderer, 0, 200, 255,
                            static_cast<Uint8>(150 + remainder * 10));
-    SDL_Rect partSeg = {x + 8 + segments * 10, y + 8, 8, 18};
+    SDL_Rect partSeg = {x + 8 + segments * 8, y + 8, 6, 18}; // Smaller segments
     SDL_RenderFillRect(renderer, &partSeg);
   }
 }

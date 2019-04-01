@@ -278,8 +278,8 @@ void Game::updatePlaying(float deltaTime) {
                                  [](const auto &p) { return !p->isActive(); }),
                   particles.end());
 
-  // Increase difficulty over time
-  difficulty += deltaTime * 0.01f;
+  // Increase difficulty over time (faster scaling)
+  difficulty += deltaTime * 0.02f;
   if (difficulty > 5.0f)
     difficulty = 5.0f;
 }
@@ -439,7 +439,17 @@ void Game::addParticle(std::unique_ptr<Particle> particle) {
 }
 
 void Game::createExplosion(float x, float y, int count, SDL_Color color) {
-  for (int i = 0; i < count; i++) {
+  // Cap particle count to prevent performance issues
+  const size_t MAX_PARTICLES = 200;
+  if (particles.size() >= MAX_PARTICLES) {
+    return; // Skip creating more particles if at limit
+  }
+
+  // Reduce count if it would exceed limit
+  int actualCount =
+      std::min(count, static_cast<int>(MAX_PARTICLES - particles.size()));
+
+  for (int i = 0; i < actualCount; i++) {
     float angle = randomFloat(0, 2.0f * 3.14159f);
     float speed = randomFloat(50, 200);
     float vx = std::cos(angle) * speed;

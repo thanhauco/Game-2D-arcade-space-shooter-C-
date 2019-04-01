@@ -73,8 +73,9 @@ void Enemy::updateDrifter(float deltaTime, Game &game) {
   if (shootTimer <= 0) {
     shootTimer = shootCooldown;
 
-    auto bullet = std::make_unique<Bullet>(position.x, position.y + height / 2,
-                                           0, 250.0f, false);
+    auto bullet =
+        std::make_unique<Bullet>(position.x, position.y + height / 2, 0, 200.0f,
+                                 false); // Reduced from 250
     game.addBullet(std::move(bullet));
   }
 }
@@ -83,19 +84,19 @@ void Enemy::updateHunter(float deltaTime, Game &game) {
   // Move downward initially
   velocity.y = 60.0f;
 
-  // Track player horizontally if game is playing
+  // Track horizontally if game is playing
+  // TODO: In future, track actual player X position via game.getPlayerX()
   if (game.getState() == GameState::Playing) {
-    // We need to get player position somehow
-    // For now, move toward center with some tracking
-    float targetX = game.getWidth() / 2.0f;
+    // Move toward player area (slightly random for variety)
+    float targetX = game.getWidth() / 2.0f + std::sin(animTimer) * 100.0f;
     float diff = targetX - position.x;
-    velocity.x = diff * 0.5f;
+    velocity.x = diff * 0.8f; // Increased tracking speed
 
     // Clamp horizontal speed
-    if (velocity.x > 150)
-      velocity.x = 150;
-    if (velocity.x < -150)
-      velocity.x = -150;
+    if (velocity.x > 180)
+      velocity.x = 180;
+    if (velocity.x < -180)
+      velocity.x = -180;
   }
 
   // Shoot more aggressively
@@ -103,9 +104,10 @@ void Enemy::updateHunter(float deltaTime, Game &game) {
   if (shootTimer <= 0) {
     shootTimer = shootCooldown;
 
-    // Shoot downward
-    auto bullet = std::make_unique<Bullet>(position.x, position.y + height / 2,
-                                           0, 300.0f, false);
+    // Shoot downward (reduced speed for fairness)
+    auto bullet =
+        std::make_unique<Bullet>(position.x, position.y + height / 2, 0, 240.0f,
+                                 false); // Reduced from 300
     game.addBullet(std::move(bullet));
   }
 }
@@ -123,8 +125,8 @@ void Enemy::updateBomber(float deltaTime, Game &game) {
     // Drop 3 bullets in a spread
     for (int i = -1; i <= 1; i++) {
       auto bullet = std::make_unique<Bullet>(position.x + i * 15.0f,
-                                             position.y + height / 2, i * 50.0f,
-                                             200.0f, false);
+                                             position.y + height / 2, i * 40.0f,
+                                             160.0f, false); // Reduced from 200
       game.addBullet(std::move(bullet));
     }
   }
