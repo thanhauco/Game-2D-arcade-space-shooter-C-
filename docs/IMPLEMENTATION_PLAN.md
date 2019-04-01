@@ -6,37 +6,48 @@ A 2D space shooter game built with C++17 and SDL2.
 
 ## Phases
 
-### Phase 1: Foundation
+### Phase 1: Foundation ✅
 
 - [x] Project setup (git, Makefile)
-- [ ] Core game loop (Game class)
-- [ ] Vector2 math utilities
+- [x] Core game loop (Game class)
+- [x] Vector2 math utilities
 
-### Phase 2: Core Entities
+### Phase 2: Core Entities ✅
 
-- [ ] Entity base class
-- [ ] Player ship implementation
-- [ ] Bullet/projectile system
+- [x] Entity base class
+- [x] Player ship implementation
+- [x] Bullet/projectile system
 
-### Phase 3: Enemies & Combat
+### Phase 3: Enemies & Combat ✅
 
-- [ ] Enemy base class
-- [ ] Drifter enemy type
-- [ ] Hunter enemy type
-- [ ] Bomber enemy type
-- [ ] Collision detection
+- [x] Enemy base class
+- [x] Drifter enemy type
+- [x] Hunter enemy type
+- [x] Bomber enemy type
+- [x] Collision detection
 
-### Phase 4: Effects & Polish
+### Phase 4: Effects & Polish ✅
 
-- [ ] Particle system
-- [ ] Explosions
-- [ ] Starfield background
+- [x] Particle system
+- [x] Explosions
+- [x] Starfield background
 
-### Phase 5: UI & Game States
+### Phase 5: UI & Game States ✅
 
-- [ ] HUD (score, health)
-- [ ] Menu state
-- [ ] Game over state
+- [x] HUD (score, health)
+- [x] Menu state
+- [x] Game over state
+
+### Phase 6: Bug Fixes ✅
+
+- [x] Issue #1: Player boundary clipping
+- [x] Issue #2: Spawn rate too aggressive
+- [x] Issue #3: Combo timer too short
+- [x] Issue #4: Difficulty scaling
+- [x] Issue #5: Hunter tracking
+- [x] Issue #6: Particle limit
+- [x] Issue #7: Score display
+- [x] Issue #8: Enemy bullet speed
 
 ## Technical Specs
 
