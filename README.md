@@ -1,5 +1,6 @@
 # Stellar Fury 🚀
 
+Migrated Project:
 A fast-paced 2D arcade space shooter built with C++17 and SDL2.
 
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
@@ -103,8 +104,6 @@ MIT License - See LICENSE file for details.
 
 ## Author
 
-Thanh Vu (thanhauco@gmail.com)
+Thanh Vu
 
 ---
-
-_Built with ❤️ in 2019_
