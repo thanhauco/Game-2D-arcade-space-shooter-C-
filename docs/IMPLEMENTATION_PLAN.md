@@ -49,6 +49,13 @@ A 2D space shooter game built with C++17 and SDL2.
 - [x] Issue #7: Score display
 - [x] Issue #8: Enemy bullet speed
 
+### Phase 7: Power-ups (In Progress)
+
+- [ ] PowerUp Entity class
+- [ ] Drop system (enemies drop items)
+- [ ] Weapon upgrades (Spread Shot)
+- [ ] Health restoration items
+
 ## Technical Specs
 
 | Spec       | Value   |
