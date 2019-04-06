@@ -5,7 +5,8 @@
 
 Player::Player(float x, float y)
     : Entity(x, y, 40, 50), speed(300.0f), shootCooldown(0.15f),
-      shootTimer(0.0f), health(5), maxHealth(5), engineFlicker(0.0f) {
+      shootTimer(0.0f), health(5), maxHealth(5), weaponLevel(0),
+      engineFlicker(0.0f) {
 
   color = {0, 200, 255, 255}; // Cyan player ship
 }
@@ -57,12 +58,25 @@ void Player::handleInput(const Uint8 *keyState) {
 }
 
 void Player::shoot(Game &game) {
-  // Create bullet at player's position
+  // Center bullet (always fires)
   auto bullet = std::make_unique<Bullet>(position.x, position.y - height / 2, 0,
                                          -500.0f, // Shoot upward
                                          true     // Player bullet
   );
   game.addBullet(std::move(bullet));
+
+  // Side bullets if upgraded
+  if (weaponLevel >= 1) {
+    // Left spread
+    auto leftBullet = std::make_unique<Bullet>(
+        position.x - 10, position.y - height / 2, -100.0f, -450.0f, true);
+    game.addBullet(std::move(leftBullet));
+
+    // Right spread
+    auto rightBullet = std::make_unique<Bullet>(
+        position.x + 10, position.y - height / 2, 100.0f, -450.0f, true);
+    game.addBullet(std::move(rightBullet));
+  }
 }
 
 void Player::clampToScreen(int screenWidth, int screenHeight) {
@@ -84,6 +98,23 @@ void Player::takeDamage(int amount) {
   health -= amount;
   if (health < 0)
     health = 0;
+
+  // Degrade weapon on damage
+  if (amount > 0 && weaponLevel > 0) {
+    weaponLevel--;
+  }
+}
+
+void Player::upgradeWeapon() {
+  weaponLevel++;
+  if (weaponLevel > 2)
+    weaponLevel = 2; // Max level
+}
+
+void Player::heal(int amount) {
+  health += amount;
+  if (health > maxHealth)
+    health = maxHealth;
 }
 
 void Player::render(SDL_Renderer *renderer) {
