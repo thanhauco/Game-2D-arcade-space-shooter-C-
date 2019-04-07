@@ -4,6 +4,7 @@
 #include "HUD.h"
 #include "Particle.h"
 #include "Player.h"
+#include "PowerUp.h"
 #include "Starfield.h"
 #include <iostream>
 
@@ -86,6 +87,8 @@ void Game::cleanup() {
   enemies.clear();
   playerBullets.clear();
   enemyBullets.clear();
+  enemyBullets.clear();
+  powerups.clear();
   particles.clear();
   starfield.reset();
   hud.reset();
@@ -201,6 +204,34 @@ void Game::updatePlaying(float deltaTime) {
     particle->update(deltaTime);
   }
 
+  // Update powerups
+  for (auto &powerup : powerups) {
+    powerup->update(deltaTime);
+  }
+
+  // Check collisions - player vs powerups
+  if (player) {
+    for (auto &powerup : powerups) {
+      if (!powerup->isActive())
+        continue;
+
+      if (player->collidesWith(*powerup)) {
+        powerup->setActive(false);
+        if (powerup->getType() == PowerUpType::WeaponUpgrade) {
+          player->upgradeWeapon();
+          createExplosion(player->getX(), player->getY(), 20,
+                          {0, 255, 255, 255});
+          addScore(500);
+        } else {
+          player->heal(2);
+          createExplosion(player->getX(), player->getY(), 20,
+                          {50, 255, 50, 255});
+          addScore(200);
+        }
+      }
+    }
+  }
+
   // Check collisions - player bullets vs enemies
   for (auto &bullet : playerBullets) {
     if (!bullet->isActive())
@@ -278,6 +309,10 @@ void Game::updatePlaying(float deltaTime) {
                                  [](const auto &p) { return !p->isActive(); }),
                   particles.end());
 
+  powerups.erase(std::remove_if(powerups.begin(), powerups.end(),
+                                [](const auto &p) { return !p->isActive(); }),
+                 powerups.end());
+
   // Increase difficulty over time (faster scaling)
   difficulty += deltaTime * 0.02f;
   if (difficulty > 5.0f)
@@ -350,6 +385,11 @@ void Game::renderPlaying() {
     enemy->render(renderer);
   }
 
+  // Render powerups
+  for (auto &powerup : powerups) {
+    powerup->render(renderer);
+  }
+
   // Render player
   if (player) {
     player->render(renderer);
@@ -396,6 +436,9 @@ void Game::startGame() {
   enemies.clear();
   playerBullets.clear();
   enemyBullets.clear();
+  playerBullets.clear();
+  enemyBullets.clear();
+  powerups.clear();
   particles.clear();
 
   // Create player
@@ -436,6 +479,14 @@ void Game::addBullet(std::unique_ptr<Bullet> bullet) {
 
 void Game::addParticle(std::unique_ptr<Particle> particle) {
   particles.push_back(std::move(particle));
+}
+
+void Game::spawnPowerUp(float x, float y) {
+  // Random type
+  PowerUpType type = (randomInt(0, 1) == 0) ? PowerUpType::WeaponUpgrade
+                                            : PowerUpType::HealthRestore;
+  auto powerup = std::make_unique<PowerUp>(x, y, type);
+  powerups.push_back(std::move(powerup));
 }
 
 void Game::createExplosion(float x, float y, int count, SDL_Color color) {
