@@ -11,6 +11,7 @@ class Player;
 class Enemy;
 class Bullet;
 class Particle;
+class PowerUp;
 class Starfield;
 class HUD;
 
@@ -38,6 +39,7 @@ public:
   void spawnEnemy();
   void addBullet(std::unique_ptr<Bullet> bullet);
   void addParticle(std::unique_ptr<Particle> particle);
+  void spawnPowerUp(float x, float y);
   void createExplosion(float x, float y, int count, SDL_Color color);
 
   // Random number generation
@@ -83,6 +85,7 @@ private:
   std::vector<std::unique_ptr<Enemy>> enemies;
   std::vector<std::unique_ptr<Bullet>> playerBullets;
   std::vector<std::unique_ptr<Bullet>> enemyBullets;
+  std::vector<std::unique_ptr<PowerUp>> powerups;
   std::vector<std::unique_ptr<Particle>> particles;
 
   // Systems

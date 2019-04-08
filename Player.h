@@ -17,6 +17,10 @@ public:
   int getHealth() const { return health; }
   int getMaxHealth() const { return maxHealth; }
 
+  void upgradeWeapon();
+  void heal(int amount);
+  int getWeaponLevel() const { return weaponLevel; }
+
 private:
   void handleInput(const Uint8 *keyState);
   void shoot(Game &game);
@@ -27,6 +31,7 @@ private:
   float shootTimer;
   int health;
   int maxHealth;
+  int weaponLevel;
 
   // Visual
   float engineFlicker;
