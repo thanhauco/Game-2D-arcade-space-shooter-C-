@@ -13,7 +13,7 @@ enum class EnemyType {
 
 class Enemy : public Entity {
 public:
-  Enemy(float x, float y, EnemyType type);
+  Enemy(float x, float y, EnemyType type, Game &game);
 
   void update(float deltaTime, Game &game);
   void render(SDL_Renderer *renderer) override;
@@ -23,7 +23,8 @@ public:
   int getScoreValue() const { return scoreValue; }
   EnemyType getType() const { return type; }
 
-private:
+protected:
+  // Base update methods (can be used by derived classes or standard types)
   void updateDrifter(float deltaTime, Game &game);
   void updateHunter(float deltaTime, Game &game);
   void updateBomber(float deltaTime, Game &game);
@@ -36,6 +37,7 @@ private:
   int health;
   int maxHealth;
   int scoreValue;
+  float speed;
   float shootTimer;
   float shootCooldown;
   float animTimer;

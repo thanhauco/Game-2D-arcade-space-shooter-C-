@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Boss.h"
 #include "Bullet.h"
 #include "Enemy.h"
 #include "HUD.h"
@@ -177,16 +178,29 @@ void Game::updatePlaying(float deltaTime) {
   }
 
   // Spawn enemies
-  enemySpawnTimer -= deltaTime;
-  if (enemySpawnTimer <= 0) {
-    spawnEnemy();
-    // Base spawn rate of 3 seconds, decreasing with difficulty
-    enemySpawnTimer = 3.0f / difficulty;
+  if (!boss) { // Don't spawn regular enemies during boss fight
+    enemySpawnTimer -= deltaTime;
+    if (enemySpawnTimer <= 0) {
+      spawnEnemy();
+      // Base spawn rate of 3 seconds, decreasing with difficulty
+      enemySpawnTimer = 3.0f / difficulty;
+    }
+  }
+
+  // Check for boss spawn
+  if (!boss && score >= 5000 &&
+      difficulty < 10.0f) { // Spawn boss at 5k score, ensure single spawn
+    spawnBoss();
+    difficulty = 10.0f; // Spike difficulty
   }
 
   // Update enemies
   for (auto &enemy : enemies) {
     enemy->update(deltaTime, *this);
+  }
+
+  if (boss) {
+    boss->update(deltaTime, *this);
   }
 
   // Update player bullets
@@ -222,101 +236,126 @@ void Game::updatePlaying(float deltaTime) {
           createExplosion(player->getX(), player->getY(), 20,
                           {0, 255, 255, 255});
           addScore(500);
-        } else {
-          player->heal(2);
-          createExplosion(player->getX(), player->getY(), 20,
-                          {50, 255, 50, 255});
-          addScore(200);
         }
+
+        // Check collision player bullet vs boss
+        if (boss && bullet->isActive()) {
+          if (bullet->collidesWith(*boss)) {
+            bullet->setActive(false);
+            boss->takeDamage(1);
+            createExplosion(bullet->getX(), bullet->getY(), 5,
+                            {255, 100, 0, 150});
+
+            if (boss->getHealth() <= 0) {
+              // Boss Defeated!
+              boss = nullptr; // Remove boss
+              addScore(5000); // Big score
+              createExplosion(400, 300, 200,
+                              {255, 255, 255, 255}); // Massive explosion
+              // Win game or loop? For now, keep going
+              difficulty = 2.0f; // Reset difficulty slightly
+            }
+          }
+        }
+      } else {
+        player->heal(2);
+        createExplosion(player->getX(), player->getY(), 20, {50, 255, 50, 255});
+        addScore(200);
       }
     }
   }
+}
 
-  // Check collisions - player bullets vs enemies
-  for (auto &bullet : playerBullets) {
+// Check collisions - player bullets vs enemies
+for (auto &bullet : playerBullets) {
+  if (!bullet->isActive())
+    continue;
+
+  for (auto &enemy : enemies) {
+    if (!enemy->isActive())
+      continue;
+
+    if (bullet->collidesWith(*enemy)) {
+      bullet->setActive(false);
+      enemy->takeDamage(1);
+      game.createExplosion(bullet->getX(), bullet->getY(), 5,
+                           {255, 200, 50, 150}); // Small hit effect
+
+      if (!enemy->isActive()) {
+        // Enemy destroyed
+        addScore(enemy->getScoreValue());
+        createExplosion(enemy->getX(), enemy->getY(), 20, {255, 150, 50, 255});
+      }
+    }
+  }
+}
+
+// Check collisions - enemy bullets vs player
+if (player) {
+  for (auto &bullet : enemyBullets) {
     if (!bullet->isActive())
       continue;
 
-    for (auto &enemy : enemies) {
-      if (!enemy->isActive())
-        continue;
-
-      if (bullet->collidesWith(*enemy)) {
-        bullet->setActive(false);
-        enemy->takeDamage(1);
-
-        if (!enemy->isActive()) {
-          // Enemy destroyed
-          addScore(enemy->getScoreValue());
-          createExplosion(enemy->getX(), enemy->getY(), 20,
-                          {255, 150, 50, 255});
-        }
-      }
+    if (bullet->collidesWith(*player)) {
+      bullet->setActive(false);
+      player->takeDamage(1);
+      createExplosion(player->getX(), player->getY(), 10, {255, 100, 100, 255});
     }
   }
 
-  // Check collisions - enemy bullets vs player
-  if (player) {
-    for (auto &bullet : enemyBullets) {
-      if (!bullet->isActive())
-        continue;
-
-      if (bullet->collidesWith(*player)) {
-        bullet->setActive(false);
-        player->takeDamage(1);
-        createExplosion(player->getX(), player->getY(), 10,
-                        {255, 100, 100, 255});
-      }
-    }
-
-    // Check collisions - enemies vs player
-    for (auto &enemy : enemies) {
-      if (!enemy->isActive())
-        continue;
-
-      if (enemy->collidesWith(*player)) {
-        enemy->setActive(false);
-        player->takeDamage(2);
-        createExplosion(enemy->getX(), enemy->getY(), 25, {255, 200, 50, 255});
-      }
-    }
+  // Check collisions - boss vs player (body slam)
+  if (boss && boss->collidesWith(*player)) {
+    player->takeDamage(1);
   }
 
-  // Update combo timer
-  if (combo > 0) {
-    comboTimer -= deltaTime;
-    if (comboTimer <= 0) {
-      combo = 0;
+  // Check collisions - enemies vs player
+  for (auto &enemy : enemies) {
+    if (!enemy->isActive())
+      continue;
+
+    if (enemy->collidesWith(*player)) {
+      enemy->setActive(false);
+      player->takeDamage(2);
+      createExplosion(enemy->getX(), enemy->getY(), 25, {255, 200, 50, 255});
     }
   }
+}
 
-  // Remove inactive entities
-  playerBullets.erase(
-      std::remove_if(playerBullets.begin(), playerBullets.end(),
-                     [](const auto &b) { return !b->isActive(); }),
-      playerBullets.end());
+// Update combo timer
+if (combo > 0) {
+  comboTimer -= deltaTime;
+  if (comboTimer <= 0) {
+    combo = 0;
+  }
+}
 
-  enemyBullets.erase(
-      std::remove_if(enemyBullets.begin(), enemyBullets.end(),
-                     [](const auto &b) { return !b->isActive(); }),
-      enemyBullets.end());
+// Remove inactive entities
+playerBullets.erase(std::remove_if(playerBullets.begin(), playerBullets.end(),
+                                   [](const auto &b) {
+                                     return !b->isActive();
+                                   }),
+                    playerBullets.end());
 
-  enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
-                               [](const auto &e) { return !e->isActive(); }),
-                enemies.end());
+enemyBullets.erase(std::remove_if(enemyBullets.begin(), enemyBullets.end(),
+                                  [](const auto &b) { return !b->isActive(); }),
+                   enemyBullets.end());
 
-  particles.erase(std::remove_if(particles.begin(), particles.end(),
-                                 [](const auto &p) { return !p->isActive(); }),
-                  particles.end());
+enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
+                             [](const auto &e) { return !e->isActive(); }),
+              enemies.end());
 
-  powerups.erase(std::remove_if(powerups.begin(), powerups.end(),
-                                [](const auto &p) { return !p->isActive(); }),
-                 powerups.end());
+particles.erase(std::remove_if(particles.begin(), particles.end(),
+                               [](const auto &p) { return !p->isActive(); }),
+                particles.end());
 
-  // Increase difficulty over time (faster scaling)
-  difficulty += deltaTime * 0.02f;
-  if (difficulty > 5.0f)
-    difficulty = 5.0f;
+powerups.erase(std::remove_if(powerups.begin(), powerups.end(),
+                              [](const auto &p) { return !p->isActive(); }),
+               powerups.end());
+
+// Increase difficulty over time (faster scaling)
+difficulty += deltaTime * 0.02f;
+if (difficulty > 5.0f)
+  difficulty = 5.0f;
 }
 
 void Game::updateGameOver(float deltaTime) {
@@ -385,6 +424,10 @@ void Game::renderPlaying() {
     enemy->render(renderer);
   }
 
+  if (boss) {
+    boss->render(renderer);
+  }
+
   // Render powerups
   for (auto &powerup : powerups) {
     powerup->render(renderer);
@@ -397,8 +440,11 @@ void Game::renderPlaying() {
 
   // Render HUD
   if (hud && player) {
+    int bossHP = boss ? boss->getHealth() : -1;
+    int bossMaxHP = boss ? boss->getMaxHealth() : -1;
+
     hud->render(renderer, score, combo, player->getHealth(),
-                player->getMaxHealth());
+                player->getMaxHealth(), bossHP, bossMaxHP);
   }
 }
 
@@ -465,8 +511,13 @@ void Game::spawnEnemy() {
   // Choose enemy type based on difficulty
   int type = randomInt(0, 2);
 
-  auto enemy = std::make_unique<Enemy>(x, y, static_cast<EnemyType>(type));
+  auto enemy =
+      std::make_unique<Enemy>(x, y, static_cast<EnemyType>(type), *this);
   enemies.push_back(std::move(enemy));
+}
+
+void Game::spawnBoss() {
+  boss = std::make_unique<Boss>(SCREEN_WIDTH / 2.0f, -100.0f, *this);
 }
 
 void Game::addBullet(std::unique_ptr<Bullet> bullet) {
