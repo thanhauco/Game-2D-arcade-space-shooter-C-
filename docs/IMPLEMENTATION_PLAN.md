@@ -56,6 +56,13 @@ A 2D space shooter game built with C++17 and SDL2.
 - [x] Weapon upgrades (Spread Shot)
 - [x] Health restoration items
 
+### Phase 8: Boss Battle ✅
+
+- [x] Boss Entity class (Multi-stage)
+- [x] Boss AI patterns (Movement & Attacks)
+- [x] Boss health bar (UI)
+- [x] Boss spawn trigger (Score/Time based)
+
 ## Technical Specs
 
 | Spec       | Value   |

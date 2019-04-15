@@ -12,6 +12,7 @@ class Enemy;
 class Bullet;
 class Particle;
 class PowerUp;
+class Boss;
 class Starfield;
 class HUD;
 
@@ -37,6 +38,7 @@ public:
   // Game actions
   void addScore(int points);
   void spawnEnemy();
+  void spawnBoss();
   void addBullet(std::unique_ptr<Bullet> bullet);
   void addParticle(std::unique_ptr<Particle> particle);
   void spawnPowerUp(float x, float y);
@@ -82,6 +84,7 @@ private:
 
   // Entities
   std::unique_ptr<Player> player;
+  std::unique_ptr<Boss> boss;
   std::vector<std::unique_ptr<Enemy>> enemies;
   std::vector<std::unique_ptr<Bullet>> playerBullets;
   std::vector<std::unique_ptr<Bullet>> enemyBullets;

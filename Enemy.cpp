@@ -4,9 +4,10 @@
 #include "Player.h"
 #include <cmath>
 
-Enemy::Enemy(float x, float y, EnemyType t)
+Enemy::Enemy(float x, float y, EnemyType t, Game &game)
     : Entity(x, y, 30, 30), type(t), health(1), maxHealth(1), scoreValue(100),
-      shootTimer(0.0f), shootCooldown(2.0f), animTimer(0.0f) {
+      speed(100.0f), shootTimer(0.0f), shootCooldown(2.0f), animTimer(0.0f) {
+  (void)game; // Unused in base constructor but available for derived classes
 
   switch (type) {
   case EnemyType::Drifter:

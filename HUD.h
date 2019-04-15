@@ -8,10 +8,11 @@ public:
   HUD();
 
   void render(SDL_Renderer *renderer, int score, int combo, int health,
-              int maxHealth);
+              int maxHealth, int bossHealth = -1, int maxBossHealth = -1);
 
 private:
   void renderHealthBar(SDL_Renderer *renderer, int health, int maxHealth);
+  void renderBossHealth(SDL_Renderer *renderer, int health, int maxHealth);
   void renderScore(SDL_Renderer *renderer, int score);
   void renderCombo(SDL_Renderer *renderer, int combo);
 
