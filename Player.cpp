@@ -6,7 +6,7 @@
 Player::Player(float x, float y)
     : Entity(x, y, 40, 50), speed(300.0f), shootCooldown(0.15f),
       shootTimer(0.0f), health(5), maxHealth(5), weaponLevel(0),
-      engineFlicker(0.0f) {
+      engineFlicker(0.0f), shieldActive(false), shieldTimer(0.0f) {
 
   color = {0, 200, 255, 255}; // Cyan player ship
 }
@@ -23,6 +23,14 @@ void Player::update(float deltaTime, const Uint8 *keyState, Game &game) {
   // Update shoot timer
   if (shootTimer > 0) {
     shootTimer -= deltaTime;
+  }
+
+  // Shield timer
+  if (shieldActive) {
+    shieldTimer -= deltaTime;
+    if (shieldTimer <= 0) {
+      shieldActive = false;
+    }
   }
 
   // Shoot if space is pressed
@@ -95,6 +103,13 @@ void Player::clampToScreen(int screenWidth, int screenHeight) {
 }
 
 void Player::takeDamage(int amount) {
+  if (shieldActive) {
+    // Shield absorbs damage
+    shieldActive = false; // Shield breaks on hit
+    shieldTimer = 0.0f;
+    return;
+  }
+
   health -= amount;
   if (health < 0)
     health = 0;
@@ -115,6 +130,11 @@ void Player::heal(int amount) {
   health += amount;
   if (health > maxHealth)
     health = maxHealth;
+}
+
+void Player::activateShield(float duration) {
+  shieldActive = true;
+  shieldTimer = duration;
 }
 
 void Player::render(SDL_Renderer *renderer) {

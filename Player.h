@@ -20,6 +20,8 @@ public:
   void upgradeWeapon();
   void heal(int amount);
   int getWeaponLevel() const { return weaponLevel; }
+  bool isShieldActive() const { return shieldActive; }
+  void activateShield(float duration);
 
 private:
   void handleInput(const Uint8 *keyState);
@@ -35,6 +37,10 @@ private:
 
   // Visual
   float engineFlicker;
+
+  // Shield state
+  bool shieldActive;
+  float shieldTimer;
 };
 
 #endif // PLAYER_H

@@ -3,8 +3,8 @@
 
 HUD::HUD() : displayedScore(0), scoreAnimTimer(0.0f) {}
 
-void HUD::render(SDL_Renderer *renderer, int score, int combo, int health,
-                 int maxHealth, int bossHealth, int maxBossHealth) {
+void HUD::render(SDL_Renderer *renderer, int score, int highScore, int combo,
+                 int health, int maxHealth, int bossHealth, int maxBossHealth) {
   // Animate score
   if (displayedScore < score) {
     int diff = score - displayedScore;
@@ -12,6 +12,7 @@ void HUD::render(SDL_Renderer *renderer, int score, int combo, int health,
   }
 
   renderScore(renderer, displayedScore);
+  renderHighScore(renderer, highScore);
   renderCombo(renderer, combo);
   renderHealthBar(renderer, health, maxHealth);
 
@@ -27,6 +28,18 @@ void HUD::renderScore(SDL_Renderer *renderer, int score) {
   if (scoreRect.w > 200)
     scoreRect.w = 200; // Cap width
   SDL_RenderFillRect(renderer, &scoreRect);
+}
+
+void HUD::renderHighScore(SDL_Renderer *renderer, int highScore) {
+  if (highScore <= 0)
+    return;
+
+  // Draw high score marker/bar
+  SDL_SetRenderDrawColor(renderer, 255, 215, 0, 255); // Gold
+  SDL_Rect highScoreRect = {20, 45, highScore / 100, 5};
+  if (highScoreRect.w > 200)
+    highScoreRect.w = 200;
+  SDL_RenderFillRect(renderer, &highScoreRect);
 }
 
 void HUD::renderCombo(SDL_Renderer *renderer, int combo) {
