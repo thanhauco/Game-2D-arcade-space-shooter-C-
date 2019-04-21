@@ -64,6 +64,9 @@ private:
   void startGame();
   void endGame();
 
+  void loadHighScore();
+  void saveHighScore();
+
   // Constants
   static const int SCREEN_WIDTH = 800;
   static const int SCREEN_HEIGHT = 600;
@@ -77,6 +80,7 @@ private:
   // Game state
   GameState state;
   int score;
+  int highScore;
   int combo;
   float comboTimer;
   float enemySpawnTimer;

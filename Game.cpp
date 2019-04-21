@@ -7,12 +7,15 @@
 #include "Player.h"
 #include "PowerUp.h"
 #include "Starfield.h"
+#include <algorithm>
+#include <fstream>
 #include <iostream>
 
 Game::Game()
     : window(nullptr), renderer(nullptr), running(false),
-      state(GameState::Menu), score(0), combo(0), comboTimer(0.0f),
-      enemySpawnTimer(0.0f), difficulty(1.0f), keyState(nullptr) {
+      state(GameState::Menu), score(0), highScore(0), combo(0),
+      comboTimer(0.0f), enemySpawnTimer(0.0f), difficulty(1.0f),
+      keyState(nullptr) {
 
   // Seed random number generator
   std::random_device rd;
@@ -58,6 +61,8 @@ bool Game::init() {
   hud = std::make_unique<HUD>();
 
   running = true;
+  loadHighScore();
+  state = GameState::Menu;
   return true;
 }
 
@@ -236,126 +241,138 @@ void Game::updatePlaying(float deltaTime) {
           createExplosion(player->getX(), player->getY(), 20,
                           {0, 255, 255, 255});
           addScore(500);
+        } else if (powerup->getType() == PowerUpType::HealthRestore) {
+          player->heal(2);
+          createExplosion(player->getX(), player->getY(), 20,
+                          {50, 255, 50, 255});
+          addScore(200);
+        } else {
+          // Shield
+          player->activateShield(10.0f); // 10 seconds shield
+          createExplosion(player->getX(), player->getY(), 20,
+                          {0, 100, 255, 255});
+          addScore(300);
         }
-
-        // Check collision player bullet vs boss
-        if (boss && bullet->isActive()) {
-          if (bullet->collidesWith(*boss)) {
-            bullet->setActive(false);
-            boss->takeDamage(1);
-            createExplosion(bullet->getX(), bullet->getY(), 5,
-                            {255, 100, 0, 150});
-
-            if (boss->getHealth() <= 0) {
-              // Boss Defeated!
-              boss = nullptr; // Remove boss
-              addScore(5000); // Big score
-              createExplosion(400, 300, 200,
-                              {255, 255, 255, 255}); // Massive explosion
-              // Win game or loop? For now, keep going
-              difficulty = 2.0f; // Reset difficulty slightly
-            }
-          }
-        }
-      } else {
-        player->heal(2);
-        createExplosion(player->getX(), player->getY(), 20, {50, 255, 50, 255});
-        addScore(200);
       }
     }
   }
-}
 
-// Check collisions - player bullets vs enemies
-for (auto &bullet : playerBullets) {
-  if (!bullet->isActive())
-    continue;
+  // Check collision player bullet vs boss
+  if (boss) {
+    for (auto &bullet : playerBullets) {
+      if (!bullet->isActive())
+        continue;
 
-  for (auto &enemy : enemies) {
-    if (!enemy->isActive())
-      continue;
+      if (bullet->collidesWith(*boss)) {
+        bullet->setActive(false);
+        boss->takeDamage(1);
+        createExplosion(bullet->getX(), bullet->getY(), 5, {255, 100, 0, 150});
 
-    if (bullet->collidesWith(*enemy)) {
-      bullet->setActive(false);
-      enemy->takeDamage(1);
-      game.createExplosion(bullet->getX(), bullet->getY(), 5,
-                           {255, 200, 50, 150}); // Small hit effect
-
-      if (!enemy->isActive()) {
-        // Enemy destroyed
-        addScore(enemy->getScoreValue());
-        createExplosion(enemy->getX(), enemy->getY(), 20, {255, 150, 50, 255});
+        if (boss->getHealth() <= 0) {
+          // Boss Defeated!
+          boss = nullptr; // Remove boss
+          addScore(5000); // Big score
+          createExplosion(400, 300, 200,
+                          {255, 255, 255, 255}); // Massive explosion
+          // Win game or loop? For now, keep going
+          difficulty = 2.0f; // Reset difficulty slightly
+        }
       }
     }
   }
-}
 
-// Check collisions - enemy bullets vs player
-if (player) {
-  for (auto &bullet : enemyBullets) {
+  // Check collisions - player bullets vs enemies
+  for (auto &bullet : playerBullets) {
     if (!bullet->isActive())
       continue;
 
-    if (bullet->collidesWith(*player)) {
-      bullet->setActive(false);
+    for (auto &enemy : enemies) {
+      if (!enemy->isActive())
+        continue;
+
+      if (bullet->collidesWith(*enemy)) {
+        bullet->setActive(false);
+        enemy->takeDamage(1);
+        game.createExplosion(bullet->getX(), bullet->getY(), 5,
+                             {255, 200, 50, 150}); // Small hit effect
+
+        if (!enemy->isActive()) {
+          // Enemy destroyed
+          addScore(enemy->getScoreValue());
+          createExplosion(enemy->getX(), enemy->getY(), 20,
+                          {255, 150, 50, 255});
+        }
+      }
+    }
+  }
+
+  // Check collisions - enemy bullets vs player
+  if (player) {
+    for (auto &bullet : enemyBullets) {
+      if (!bullet->isActive())
+        continue;
+
+      if (bullet->collidesWith(*player)) {
+        bullet->setActive(false);
+        player->takeDamage(1);
+        createExplosion(player->getX(), player->getY(), 10,
+                        {255, 100, 100, 255});
+      }
+    }
+
+    // Check collisions - boss vs player (body slam)
+    if (boss && boss->collidesWith(*player)) {
       player->takeDamage(1);
-      createExplosion(player->getX(), player->getY(), 10, {255, 100, 100, 255});
+    }
+
+    // Check collisions - enemies vs player
+    for (auto &enemy : enemies) {
+      if (!enemy->isActive())
+        continue;
+
+      if (enemy->collidesWith(*player)) {
+        enemy->setActive(false);
+        player->takeDamage(2);
+        createExplosion(enemy->getX(), enemy->getY(), 25, {255, 200, 50, 255});
+      }
     }
   }
 
-  // Check collisions - boss vs player (body slam)
-  if (boss && boss->collidesWith(*player)) {
-    player->takeDamage(1);
-  }
-
-  // Check collisions - enemies vs player
-  for (auto &enemy : enemies) {
-    if (!enemy->isActive())
-      continue;
-
-    if (enemy->collidesWith(*player)) {
-      enemy->setActive(false);
-      player->takeDamage(2);
-      createExplosion(enemy->getX(), enemy->getY(), 25, {255, 200, 50, 255});
+  // Update combo timer
+  if (combo > 0) {
+    comboTimer -= deltaTime;
+    if (comboTimer <= 0) {
+      combo = 0;
     }
   }
-}
 
-// Update combo timer
-if (combo > 0) {
-  comboTimer -= deltaTime;
-  if (comboTimer <= 0) {
-    combo = 0;
-  }
-}
+  // Remove inactive entities
+  playerBullets.erase(
+      std::remove_if(playerBullets.begin(), playerBullets.end(),
+                     [](const auto &b) { return !b->isActive(); }),
+      playerBullets.end());
 
-// Remove inactive entities
-playerBullets.erase(std::remove_if(playerBullets.begin(), playerBullets.end(),
-                                   [](const auto &b) {
-                                     return !b->isActive();
-                                   }),
-                    playerBullets.end());
+  enemyBullets.erase(
+      std::remove_if(enemyBullets.begin(), enemyBullets.end(),
+                     [](const auto &b) { return !b->isActive(); }),
+      enemyBullets.end());
 
-enemyBullets.erase(std::remove_if(enemyBullets.begin(), enemyBullets.end(),
-                                  [](const auto &b) { return !b->isActive(); }),
-                   enemyBullets.end());
+  enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
+                               [](const auto &e) { return !e->isActive(); }),
+                enemies.end());
 
-enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
-                             [](const auto &e) { return !e->isActive(); }),
-              enemies.end());
+  particles.erase(std::remove_if(particles.begin(), particles.end(),
+                                 [](const auto &p) { return !p->isActive(); }),
+                  particles.end());
 
-particles.erase(std::remove_if(particles.begin(), particles.end(),
-                               [](const auto &p) { return !p->isActive(); }),
-                particles.end());
+  powerups.erase(std::remove_if(powerups.begin(), powerups.end(),
+                                [](const auto &p) { return !p->isActive(); }),
+                 powerups.end());
 
-powerups.erase(std::remove_if(powerups.begin(), powerups.end(),
-                              [](const auto &p) { return !p->isActive(); }),
-               powerups.end());
-
-// Increase difficulty over time (faster scaling)
-difficulty += deltaTime * 0.02f;
-if (difficulty > 5.0f)
-  difficulty = 5.0f;
+  // Increase difficulty over time (faster scaling)
+  difficulty += deltaTime * 0.02f;
+  if (difficulty > 5.0f)
+    difficulty = 5.0f;
 }
 
 void Game::updateGameOver(float deltaTime) {
@@ -443,7 +460,7 @@ void Game::renderPlaying() {
     int bossHP = boss ? boss->getHealth() : -1;
     int bossMaxHP = boss ? boss->getMaxHealth() : -1;
 
-    hud->render(renderer, score, combo, player->getHealth(),
+    hud->render(renderer, score, highScore, combo, player->getHealth(),
                 player->getMaxHealth(), bossHP, bossMaxHP);
   }
 }
@@ -496,6 +513,11 @@ void Game::startGame() {
 void Game::endGame() {
   state = GameState::GameOver;
   createExplosion(player->getX(), player->getY(), 50, {255, 200, 100, 255});
+
+  if (score > highScore) {
+    highScore = score;
+    saveHighScore();
+  }
 }
 
 void Game::addScore(int points) {
@@ -534,8 +556,15 @@ void Game::addParticle(std::unique_ptr<Particle> particle) {
 
 void Game::spawnPowerUp(float x, float y) {
   // Random type
-  PowerUpType type = (randomInt(0, 1) == 0) ? PowerUpType::WeaponUpgrade
-                                            : PowerUpType::HealthRestore;
+  int r = randomInt(0, 2);
+  PowerUpType type;
+  if (r == 0)
+    type = PowerUpType::WeaponUpgrade;
+  else if (r == 1)
+    type = PowerUpType::HealthRestore;
+  else
+    type = PowerUpType::Shield;
+
   auto powerup = std::make_unique<PowerUp>(x, y, type);
   powerups.push_back(std::move(powerup));
 }
@@ -573,4 +602,22 @@ float Game::randomFloat(float min, float max) {
 int Game::randomInt(int min, int max) {
   std::uniform_int_distribution<int> dist(min, max);
   return dist(rng);
+}
+
+void Game::loadHighScore() {
+  std::ifstream file("highscore.txt");
+  if (file.is_open()) {
+    file >> highScore;
+    file.close();
+  } else {
+    highScore = 0;
+  }
+}
+
+void Game::saveHighScore() {
+  std::ofstream file("highscore.txt");
+  if (file.is_open()) {
+    file << highScore;
+    file.close();
+  }
 }

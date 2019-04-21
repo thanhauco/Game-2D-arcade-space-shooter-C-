@@ -63,6 +63,12 @@ A 2D space shooter game built with C++17 and SDL2.
 - [x] Boss health bar (UI)
 - [x] Boss spawn trigger (Score/Time based)
 
+### Phase 9: Polish & Persistence ✅
+
+- [x] High Score saving/loading (File I/O)
+- [x] Shield Power-up (New type & logic)
+- [x] Visual indication for Shield (Player overlay)
+
 ## Technical Specs
 
 | Spec       | Value   |

@@ -19,6 +19,9 @@ PowerUp::PowerUp(float x, float y, PowerUpType t)
   case PowerUpType::HealthRestore:
     color = {50, 255, 50, 255}; // Green
     break;
+  case PowerUpType::Shield:
+    color = {0, 100, 255, 255}; // Blue
+    break;
   }
 }
 
@@ -64,11 +67,16 @@ void PowerUp::render(SDL_Renderer *renderer) {
                        position.x + 10, position.y + 15);
     SDL_RenderDrawLine(renderer, position.x + 10, position.y + 15,
                        position.x + 15, position.y + 5);
-  } else {
+  } else if (type == PowerUpType::HealthRestore) {
     // "+" shape
     SDL_RenderDrawLine(renderer, position.x + 10, position.y + 5,
                        position.x + 10, position.y + 15);
     SDL_RenderDrawLine(renderer, position.x + 5, position.y + 10,
                        position.x + 15, position.y + 10);
+  } else if (type == PowerUpType::Shield) {
+    // "O" shape (Circle-ish)
+    SDL_Rect circle = {static_cast<int>(position.x + 5),
+                       static_cast<int>(position.y + 5), 10, 10};
+    SDL_RenderDrawRect(renderer, &circle);
   }
 }
