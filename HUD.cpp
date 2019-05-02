@@ -79,7 +79,7 @@ void HUD::renderBossHealth(SDL_Renderer *renderer, int health, int maxHealth) {
   int y = 50;                   // Below standard HUD
 
   // Background
-  SDL_SetRenderDrawColor(renderer, 50, 0, 0, 255); // Dark red bg
+  SDL_SetRenderDrawColor(renderer, 50, 0, 50, 255); // Dark purple bg
   SDL_Rect bgRect = {x, y, barWidth, barHeight};
   SDL_RenderFillRect(renderer, &bgRect);
 
@@ -87,7 +87,7 @@ void HUD::renderBossHealth(SDL_Renderer *renderer, int health, int maxHealth) {
   float healthPercent = (float)health / maxHealth;
   int currentWidth = (int)(barWidth * healthPercent);
 
-  SDL_SetRenderDrawColor(renderer, 255, 100, 0, 255); // Orange/Red
+  SDL_SetRenderDrawColor(renderer, 200, 0, 255, 255); // Magenta
   SDL_Rect healthRect = {x, y, currentWidth, barHeight};
   SDL_RenderFillRect(renderer, &healthRect);
 }
