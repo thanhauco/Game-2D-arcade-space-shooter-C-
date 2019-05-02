@@ -608,6 +608,10 @@ void Game::loadHighScore() {
   std::ifstream file("highscore.txt");
   if (file.is_open()) {
     file >> highScore;
+    // Hotfix: Ensure valid score
+    if (file.fail() || highScore < 0) {
+      highScore = 0;
+    }
     file.close();
   } else {
     highScore = 0;
