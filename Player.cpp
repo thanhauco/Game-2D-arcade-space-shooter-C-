@@ -160,6 +160,22 @@ void Player::render(SDL_Renderer *renderer) {
   SDL_RenderFillRect(renderer, &leftWing);
   SDL_RenderFillRect(renderer, &rightWing);
 
+  // Render Shield
+  if (shieldActive) {
+    // Pulse alpha (faster when low on time)
+    float pulseSpeed = (shieldTimer < 3.0f) ? 30.0f : 10.0f;
+
+    int alpha = 100 + static_cast<int>(50 * std::sin(shieldTimer * pulseSpeed));
+    SDL_SetRenderDrawColor(renderer, 0, 100, 255, alpha);
+    SDL_Rect shieldRect = {static_cast<int>(position.x - width / 2 - 5),
+                           static_cast<int>(position.y - height / 2 - 5),
+                           static_cast<int>(width + 10),
+                           static_cast<int>(height + 10)};
+    SDL_RenderDrawRect(
+        renderer,
+        &shieldRect); // Draw a transparent rectangle around the player
+  }
+
   // Engine glow (flickering)
   int glowIntensity = static_cast<int>(150 + 100 * std::sin(engineFlicker));
   SDL_SetRenderDrawColor(renderer, 255, glowIntensity, 50, 255);
@@ -167,3 +183,4 @@ void Player::render(SDL_Renderer *renderer) {
                      static_cast<int>(position.y + 15), 16, 10};
   SDL_RenderFillRect(renderer, &engine);
 }
+```

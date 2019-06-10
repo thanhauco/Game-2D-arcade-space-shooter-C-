@@ -69,11 +69,11 @@ A 2D space shooter game built with C++17 and SDL2.
 - [x] Shield Power-up (New type & logic)
 - [x] Visual indication for Shield (Player overlay)
 
-### Phase 10: Post-Release Maintenance (In Progress)
+### Phase 10: Post-Release Maintenance ✅
 
 - [x] Hotfix: Safe High Score loading
 - [x] Polish: Boss UI color tweaks
-- [ ] Polish: Shield visual improvements
+- [x] Polish: Shield visual improvements
 
 ## Technical Specs
 
