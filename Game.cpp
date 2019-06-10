@@ -7,7 +7,6 @@
 #include "Player.h"
 #include "PowerUp.h"
 #include "Starfield.h"
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 
