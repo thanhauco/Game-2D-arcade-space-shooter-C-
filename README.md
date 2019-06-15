@@ -14,11 +14,20 @@ A fast-paced 2D arcade space shooter built with C++17 and SDL2.
 - **Multiple Enemy Types** - Drifters, Hunters, and Bombers
 - **Particle Effects** - Explosions, engine trails, bullet impacts
 - **Score System** - With combo multipliers
+- **Interactive Power-ups** - Weapon upgrades, Health restore, and **Shields**
+- **Epic Boss Battles** - Multi-stage boss fights
+- **Persistent High Scores** - Track your best runs
 - **Parallax Starfield** - Multi-layer depth background
 
 ## Screenshots
 
-_Coming soon_
+<p align="center">
+  <img src="screenshots/gameplay.svg" width="48%" alt="Gameplay"/>
+  <img src="screenshots/boss.svg" width="48%" alt="Boss Battle"/>
+</p>
+<p align="center">
+  <img src="screenshots/shield.svg" width="80%" alt="Shield Activation"/>
+</p>
 
 ## Requirements
 

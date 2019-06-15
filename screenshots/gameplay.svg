@@ -1,0 +1,40 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#000000"/>
+  <!-- Stars -->
+  <circle cx="100" cy="100" r="2" fill="white"/>
+  <circle cx="200" cy="50" r="1" fill="white"/>
+  <circle cx="500" cy="300" r="2" fill="white"/>
+  <circle cx="700" cy="500" r="1.5" fill="white"/>
+  <circle cx="50" cy="500" r="2" fill="white"/>
+  <circle cx="300" cy="200" r="1" fill="white"/>
+  <circle cx="600" cy="100" r="2" fill="white"/>
+  
+  <!-- HUD -->
+  <text x="20" y="40" font-family="monospace" font-size="24" fill="white">SCORE: 15400</text>
+  <rect x="600" y="20" width="180" height="20" fill="#333"/>
+  <rect x="600" y="20" width="140" height="20" fill="#00FF00"/>
+
+  <!-- Enemies -->
+  <g transform="translate(100, 100)">
+    <path d="M0,0 L20,-20 L40,0 L20,10 Z" fill="#FF0000" stroke="white" stroke-width="2"/>
+  </g>
+  <g transform="translate(300, 150)">
+    <path d="M0,0 L20,-20 L40,0 L20,10 Z" fill="#FF0000" stroke="white" stroke-width="2"/>
+  </g>
+  <g transform="translate(500, 120)">
+    <path d="M0,0 L20,-20 L40,0 L20,10 Z" fill="#FF0000" stroke="white" stroke-width="2"/>
+  </g>
+
+  <!-- Player -->
+  <g transform="translate(380, 500)">
+    <polygon points="20,0 40,50 20,40 0,50" fill="#00CCFF" stroke="white" stroke-width="2"/>
+    <!-- Engine Flame -->
+    <polygon points="10,48 30,48 20,60" fill="#FF9900"/>
+  </g>
+
+  <!-- Bullets -->
+  <rect x="398" y="450" width="4" height="15" fill="#FFFF00"/>
+  <rect x="402" y="420" width="4" height="15" fill="#FFFF00"/>
+
+</svg>
