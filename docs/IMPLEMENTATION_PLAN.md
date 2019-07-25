@@ -75,6 +75,11 @@ A 2D space shooter game built with C++17 and SDL2.
 - [x] Polish: Boss UI color tweaks
 - [x] Polish: Shield visual improvements
 
+### Phase 11: Advanced Combat ✅
+
+- [x] Screen Shake (Juice)
+- [x] Charge Shot (New Mechanic)
+
 ## Technical Specs
 
 | Spec       | Value   |

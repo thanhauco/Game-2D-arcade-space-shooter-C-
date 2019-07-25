@@ -1,7 +1,7 @@
 #include "Bullet.h"
 
 Bullet::Bullet(float x, float y, float vx, float vy, bool isPlayer)
-    : Entity(x, y, 6, 12), playerBullet(isPlayer), lifetime(3.0f),
+    : Entity(x, y, 6, 12), playerBullet(isPlayer), damage(1), lifetime(3.0f),
       trailTimer(0.0f) {
 
   velocity = Vector2(vx, vy);

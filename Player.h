@@ -25,7 +25,7 @@ public:
 
 private:
   void handleInput(const Uint8 *keyState);
-  void shoot(Game &game);
+  void shoot(Game &game, bool charged = false);
   void clampToScreen(int screenWidth, int screenHeight);
 
   float speed;

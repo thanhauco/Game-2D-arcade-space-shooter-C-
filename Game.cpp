@@ -14,7 +14,7 @@ Game::Game()
     : window(nullptr), renderer(nullptr), running(false),
       state(GameState::Menu), score(0), highScore(0), combo(0),
       comboTimer(0.0f), enemySpawnTimer(0.0f), difficulty(1.0f),
-      keyState(nullptr) {
+      keyState(nullptr), shakeTimer(0.0f), shakeIntensity(0.0f) {
 
   // Seed random number generator
   std::random_device rd;
@@ -227,6 +227,12 @@ void Game::updatePlaying(float deltaTime) {
     powerup->update(deltaTime);
   }
 
+  if (shakeTimer > 0) {
+    shakeTimer -= deltaTime;
+    if (shakeTimer <= 0)
+      shakeTimer = 0;
+  }
+
   // Check collisions - player vs powerups
   if (player) {
     for (auto &powerup : powerups) {
@@ -291,9 +297,9 @@ void Game::updatePlaying(float deltaTime) {
 
       if (bullet->collidesWith(*enemy)) {
         bullet->setActive(false);
-        enemy->takeDamage(1);
-        game.createExplosion(bullet->getX(), bullet->getY(), 5,
-                             {255, 200, 50, 150}); // Small hit effect
+        enemy->takeDamage(bullet->getDamage());
+        createExplosion(bullet->getX(), bullet->getY(), 5,
+                        {255, 200, 50, 150}); // Small hit effect
 
         if (!enemy->isActive()) {
           // Enemy destroyed
@@ -383,6 +389,19 @@ void Game::render() {
   SDL_SetRenderDrawColor(renderer, 10, 10, 20, 255);
   SDL_RenderClear(renderer);
 
+  // Calculate screen shake offset
+  int shakeX = 0;
+  int shakeY = 0;
+
+  if (shakeTimer > 0) {
+    shakeX = randomInt(-shakeIntensity, shakeIntensity);
+    shakeY = randomInt(-shakeIntensity, shakeIntensity);
+  }
+
+  // Apply camera offset (simulated via viewport)
+  SDL_Rect viewport = {shakeX, shakeY, SCREEN_WIDTH, SCREEN_HEIGHT};
+  SDL_RenderSetViewport(renderer, &viewport);
+
   // Render starfield (always visible)
   starfield->render(renderer);
 
@@ -405,6 +424,9 @@ void Game::render() {
     renderGameOver();
     break;
   }
+
+  // Reset viewport to full screen after rendering
+  SDL_RenderSetViewport(renderer, nullptr);
 
   SDL_RenderPresent(renderer);
 }
@@ -569,6 +591,13 @@ void Game::spawnPowerUp(float x, float y) {
 }
 
 void Game::createExplosion(float x, float y, int count, SDL_Color color) {
+  // Add shake for big explosions
+  if (count > 20) {
+    addScreenShake(0.2f, 5.0f);
+  } else if (count > 50) {
+    addScreenShake(0.5f, 10.0f);
+  }
+
   // Cap particle count to prevent performance issues
   const size_t MAX_PARTICLES = 200;
   if (particles.size() >= MAX_PARTICLES) {
@@ -622,5 +651,12 @@ void Game::saveHighScore() {
   if (file.is_open()) {
     file << highScore;
     file.close();
+  }
+}
+
+void Game::addScreenShake(float duration, float intensity) {
+  if (shakeTimer <= 0 || intensity > shakeIntensity) {
+    shakeTimer = duration;
+    shakeIntensity = intensity;
   }
 }

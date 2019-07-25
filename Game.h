@@ -95,6 +95,11 @@ private:
   std::vector<std::unique_ptr<PowerUp>> powerups;
   std::vector<std::unique_ptr<Particle>> particles;
 
+  // Effects
+  float shakeTimer;
+  float shakeIntensity;
+  void addScreenShake(float duration, float intensity);
+
   // Systems
   std::unique_ptr<Starfield> starfield;
   std::unique_ptr<HUD> hud;
