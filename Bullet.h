@@ -11,9 +11,11 @@ public:
   void render(SDL_Renderer *renderer) override;
 
   bool isPlayerBullet() const { return playerBullet; }
+  int getDamage() const { return damage; }
 
 private:
   bool playerBullet;
+  int damage;
   float lifetime;
   float trailTimer;
 };
