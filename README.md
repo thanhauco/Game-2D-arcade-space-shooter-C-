@@ -103,8 +103,6 @@ MIT License - See LICENSE file for details.
 
 ## Author
 
-Thanh Vu (thanhauco@gmail.com)
+Thanh Vu
 
 ---
-
-_Built with ❤️ in 2019_
